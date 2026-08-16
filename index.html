@@ -1,0 +1,1566 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Calendar Adventure</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+ margin:0;
+ padding:0;
+ width:100%;
+ min-height:100%;
+ overflow-x:hidden;
+ direction:ltr;
+}
+
+body{
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#60a5fa,#a78bfa);
+ padding:10px;
+ color:#1f2937;
+ text-align:left;
+}
+
+.app{
+ width:100%;
+ max-width:900px;
+ margin:auto;
+ background:#fff;
+ border-radius:24px;
+ padding:16px;
+ box-shadow:0 12px 35px #0003;
+ overflow:hidden;
+}
+
+h1{
+ text-align:center;
+ color:#4338ca;
+ font-size:30px;
+ margin:2px 0 4px;
+}
+
+.brand{
+ text-align:center;
+ color:#64748b;
+ font-weight:bold;
+ margin-bottom:12px;
+}
+
+.info{
+ display:flex;
+ justify-content:space-around;
+ gap:5px;
+ background:#eef2ff;
+ border-radius:16px;
+ padding:10px;
+ font-weight:bold;
+ font-size:16px;
+}
+
+.timer{
+ text-align:center;
+ font-weight:bold;
+ font-size:21px;
+ margin:9px;
+}
+
+.danger{color:#ef4444}
+
+.progress{
+ height:9px;
+ background:#e5e7eb;
+ border-radius:10px;
+ overflow:hidden;
+}
+
+.bar{
+ height:100%;
+ width:0;
+ background:#22c55e;
+}
+
+.center{text-align:center}
+
+.emoji{font-size:62px}
+
+button{
+ border:0;
+ border-radius:14px;
+ padding:13px 20px;
+ margin:5px;
+ background:#22c55e;
+ color:#fff;
+ font-size:18px;
+ font-weight:bold;
+ cursor:pointer;
+ touch-action:manipulation;
+}
+
+.gray{background:#64748b}
+
+.hidden{display:none}
+
+.instruction{
+ text-align:center;
+ font-size:21px;
+ font-weight:bold;
+ margin:15px 0;
+}
+
+.area{
+ background:#f8fafc;
+ border-radius:18px;
+ padding:12px;
+ overflow:hidden;
+}
+
+.title{
+ text-align:center;
+ color:#4338ca;
+ font-size:23px;
+ font-weight:bold;
+ margin-bottom:12px;
+}
+
+.week{
+ display:grid;
+ grid-template-columns:repeat(7,minmax(0,1fr));
+ gap:5px;
+}
+
+.months{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:7px;
+}
+
+.slot{
+ min-width:0;
+ min-height:58px;
+ border:3px dashed #8b5cf6;
+ border-radius:11px;
+ background:#fff;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ font-weight:bold;
+ color:#7c3aed;
+ padding:4px;
+ word-break:break-word;
+}
+
+.slot.filled{
+ background:#dcfce7;
+ border:3px solid #22c55e;
+ color:#166534;
+}
+
+.cards{
+ display:flex;
+ flex-wrap:wrap;
+ justify-content:center;
+ gap:8px;
+ margin:15px 0;
+}
+
+.card{
+ padding:10px 14px;
+ border-radius:13px;
+ background:#6366f1;
+ color:#fff;
+ font-weight:bold;
+ cursor:pointer;
+ touch-action:none;
+ user-select:none;
+}
+
+.card.selected{
+ background:#f59e0b;
+ outline:4px solid #fde68a;
+}
+
+.card.used{
+ opacity:.2;
+ pointer-events:none;
+}
+
+.question{
+ background:#eef2ff;
+ border-radius:18px;
+ padding:18px;
+ text-align:center;
+}
+
+.question h2{
+ font-size:23px;
+ margin:0;
+}
+
+.options{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:9px;
+ margin-top:12px;
+}
+
+.option{
+ background:#6366f1;
+ width:100%;
+}
+
+.correct{background:#22c55e!important}
+.wrong{background:#ef4444!important}
+
+.msg{
+ text-align:center;
+ min-height:30px;
+ font-weight:bold;
+ font-size:19px;
+ margin-top:8px;
+}
+
+.scorebig{
+ font-size:40px;
+ color:#4338ca;
+ font-weight:bold;
+}
+
+.footer{
+ text-align:center;
+ color:#64748b;
+ font-size:14px;
+ margin-top:12px;
+}
+
+.gameover-overlay.hidden{
+ display:none!important;
+}
+
+.gameover-overlay{
+ position:fixed;
+ inset:0;
+ background:rgba(31,41,55,.72);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+ z-index:9999;
+}
+
+.gameover-card{
+ width:min(92vw,430px);
+ background:#fff;
+ border-radius:28px;
+ padding:28px 20px;
+ text-align:center;
+ box-shadow:0 20px 60px #0006;
+ animation:pop .25s ease-out;
+}
+
+.gameover-card .big{
+ font-size:64px;
+ margin-bottom:8px;
+}
+
+.gameover-card h2{
+ margin:5px 0 10px;
+ font-size:30px;
+ color:#4338ca;
+}
+
+.gameover-card p{
+ font-size:19px;
+ margin:8px 0;
+ color:#4b5563;
+}
+
+@keyframes pop{
+ from{
+  transform:scale(.75);
+  opacity:0;
+ }
+ to{
+  transform:scale(1);
+  opacity:1;
+ }
+}
+
+@media(max-width:600px){
+
+ .app{
+  padding:10px;
+  border-radius:18px;
+ }
+
+ h1{font-size:24px}
+
+ .info{
+  font-size:12px;
+  padding:8px;
+ }
+
+ .months{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+ }
+
+ .slot{
+  min-height:52px;
+  font-size:12px;
+ }
+
+ .week{gap:3px}
+
+ .week .slot{
+  font-size:9px;
+  min-height:48px;
+ }
+
+ .options{
+  grid-template-columns:1fr;
+ }
+
+ .card{
+  font-size:13px;
+  padding:9px 11px;
+ }
+}
+
+@media(max-width:360px){
+
+ body{padding:3px}
+
+ .app{padding:8px}
+
+ .slot{font-size:11px}
+
+ .week .slot{font-size:8px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>📚 Calendar Adventure</h1>
+
+<div class="brand">
+Ms. Ramezanzadeh
+</div>
+
+<div id="hud" class="hidden">
+
+ <div class="info">
+  <div>⭐ <span id="score">0</span></div>
+  <div>❤️ <span id="lives">3</span></div>
+  <div>🏆 <span id="level">1</span>/10</div>
+ </div>
+
+ <div id="timer" class="timer">
+  ⏱️ 60
+ </div>
+
+ <div class="progress">
+  <div id="bar" class="bar"></div>
+ </div>
+
+</div>
+
+<section id="start" class="center">
+
+ <div class="emoji">🚀📚</div>
+
+ <h2>Welcome!</h2>
+
+ <p>
+  Learn the days and months by playing.
+ </p>
+
+ <button onclick="startGame()">
+  START GAME 🎵
+ </button>
+
+ <button class="gray" onclick="musicToggle()">
+  🔊 Music
+ </button>
+
+</section>
+
+<section id="play" class="hidden">
+
+ <div id="instruction" class="instruction"></div>
+
+ <div id="area" class="area"></div>
+
+ <div id="cards" class="cards"></div>
+
+ <div id="options" class="options"></div>
+
+ <div id="msg" class="msg"></div>
+
+</section>
+
+<section id="end" class="hidden center">
+
+ <div class="emoji">🏆</div>
+
+ <h2 id="resultTitle">
+  GREAT JOB!
+ </h2>
+
+ <p id="resultMessage">
+  Final score:
+ </p>
+
+ <div id="final" class="scorebig">
+  0
+ </div>
+
+ <p>
+  Ms. Ramezanzadeh
+ </p>
+
+ <button onclick="startGame()">
+  PLAY AGAIN 🔄
+ </button>
+
+</section>
+
+<div id="gameOverOverlay"
+     class="gameover-overlay hidden"
+     style="display:none">
+
+ <div class="gameover-card">
+
+  <div id="gameOverIcon" class="big">
+   ⏰
+  </div>
+
+  <h2 id="gameOverTitle">
+   TIME'S UP!
+  </h2>
+
+  <p id="gameOverText">
+   Your time is over.
+  </p>
+
+  <p>
+   Score:
+   <strong id="gameOverScore">0</strong>
+   ⭐
+  </p>
+
+  <button onclick="closeGameOver(true)">
+   PLAY AGAIN 🔄
+  </button>
+
+  <button class="gray" onclick="closeGameOver(false)">
+   SEE RESULT
+  </button>
+
+ </div>
+
+</div>
+
+<div class="footer">
+Ms. Ramezanzadeh
+</div>
+
+</div>
+
+<!-- Music file: keep music.mp3 in the same folder as index.html -->
+<audio id="music" loop preload="auto">
+ <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+const DAYS=[
+ "Monday",
+ "Tuesday",
+ "Wednesday",
+ "Thursday",
+ "Friday",
+ "Saturday",
+ "Sunday"
+];
+
+const MONTHS=[
+ "January",
+ "February",
+ "March",
+ "April",
+ "May",
+ "June",
+ "July",
+ "August",
+ "September",
+ "October",
+ "November",
+ "December"
+];
+
+let score=0,
+    lives=3,
+    level=1,
+    time=60,
+    timer=null,
+    selected=null;
+
+let asked=new Set();
+
+const $=id=>document.getElementById(id);
+
+function shuffle(a){
+
+ for(let i=a.length-1;i>0;i--){
+
+  const j=Math.floor(Math.random()*(i+1));
+
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+
+ return a;
+}
+
+function startGame(){
+
+ clearInterval(timer);
+
+ score=0;
+ lives=3;
+ level=1;
+ asked=new Set();
+ selected=null;
+
+ $("score").textContent=score;
+ $("lives").textContent=lives;
+ $("level").textContent=level;
+
+ $("start").classList.add("hidden");
+ $("end").classList.add("hidden");
+ $("play").classList.remove("hidden");
+ $("hud").classList.remove("hidden");
+
+ playMusic();
+
+ loadLevel();
+}
+
+function loadLevel(){
+
+ clearInterval(timer);
+
+ time=60;
+ selected=null;
+
+ $("level").textContent=level;
+
+ $("bar").style.width=
+ ((level-1)/10*100)+"%";
+
+ $("area").innerHTML="";
+ $("cards").innerHTML="";
+ $("options").innerHTML="";
+ $("msg").textContent="";
+
+ [
+  level1,
+  level2,
+  level3,
+  level4,
+  level5,
+  level6,
+  level7,
+  level8,
+  level9,
+  level10
+ ][level-1]();
+
+ showTimer();
+
+ timer=setInterval(()=>{
+
+  time--;
+
+  showTimer();
+
+  if(time<=0){
+
+   clearInterval(timer);
+
+   showGameOver(
+    "⏰",
+    "TIME'S UP!",
+    "Your time is over. Try again!"
+   );
+  }
+
+ },1000);
+}
+
+function showTimer(){
+
+ $("timer").textContent="⏱️ "+time;
+
+ $("timer").classList.toggle(
+  "danger",
+  time<=10
+ );
+}
+
+function loseOneLife(reason){
+
+ lives=Math.max(0,lives-1);
+
+ $("lives").textContent=lives;
+
+ if(lives===0){
+
+  clearInterval(timer);
+
+  showGameOver(
+   "❤️",
+   "GAME OVER!",
+   "You used all 3 lives."
+  );
+
+  return false;
+ }
+
+ return true;
+}
+
+function loseLife(text){
+
+ clearInterval(timer);
+
+ if(!loseOneLife(text)) return;
+
+ message(text,false);
+
+ setTimeout(loadLevel,800);
+}
+
+function showGameOver(icon,title,text){
+
+ clearInterval(timer);
+
+ gameOverSound();
+
+ $("gameOverIcon").textContent=icon;
+ $("gameOverTitle").textContent=title;
+ $("gameOverText").textContent=text;
+ $("gameOverScore").textContent=score;
+
+ $("gameOverOverlay").classList.remove("hidden");
+ $("gameOverOverlay").style.display="flex";
+}
+
+function closeGameOver(restart){
+
+ $("gameOverOverlay").classList.add("hidden");
+ $("gameOverOverlay").style.display="none";
+
+ if(restart)
+  startGame();
+ else
+  endGame(false);
+}
+
+function nextLevel(){
+
+ if(level>=10){
+
+  endGame(true);
+  return;
+ }
+
+ level++;
+
+ loadLevel();
+}
+
+function endGame(won=false){
+
+ clearInterval(timer);
+
+ $("gameOverOverlay").classList.add("hidden");
+ $("gameOverOverlay").style.display="none";
+
+ $("play").classList.add("hidden");
+ $("hud").classList.add("hidden");
+ $("end").classList.remove("hidden");
+
+ if(won){
+
+  $("resultTitle").textContent="🎉 GREAT JOB!";
+  $("resultMessage").textContent=
+   "You completed the game!";
+
+ }else{
+
+  $("resultTitle").textContent="😔 GAME OVER";
+  $("resultMessage").textContent=
+   "Don't give up! Try again.";
+ }
+
+ $("final").textContent=score+" ⭐";
+}
+
+function message(t,good){
+
+ $("msg").textContent=t;
+
+ $("msg").style.color=
+  good ? "#16a34a" : "#dc2626";
+}
+
+function addScore(n){
+
+ score+=n;
+
+ $("score").textContent=score;
+}
+
+function makeCard(value){
+
+ const c=document.createElement("div");
+
+ c.className="card";
+ c.textContent=value;
+ c.dataset.value=value;
+
+ c.onclick=()=>{
+
+  if(c.classList.contains("used"))
+   return;
+
+  if(selected)
+   selected.classList.remove("selected");
+
+  selected=c;
+
+  c.classList.add("selected");
+
+  message(
+   "Now tap the correct box 👆",
+   true
+  );
+ };
+
+ c.draggable=true;
+
+ c.ondragstart=e=>{
+
+  selected=c;
+
+  e.dataTransfer.setData(
+   "text/plain",
+   value
+  );
+
+  c.classList.add("selected");
+ };
+
+ c.ondragend=()=>{
+  c.classList.remove("selected");
+ };
+
+ return c;
+}
+
+function renderCards(values){
+
+ shuffle([...values]).forEach(v=>
+  $("cards").appendChild(
+   makeCard(v)
+  )
+ );
+}
+
+function makeSlot(answer){
+
+ const s=document.createElement("div");
+
+ s.className="slot";
+ s.dataset.answer=answer;
+ s.textContent="DROP HERE";
+
+ s.ondragover=e=>e.preventDefault();
+
+ s.ondrop=e=>{
+
+  e.preventDefault();
+
+  const v=
+   e.dataTransfer.getData("text/plain");
+
+  const c=[
+   ...document.querySelectorAll(".card")
+  ].find(x=>
+   x.dataset.value===v &&
+   !x.classList.contains("used")
+  );
+
+  if(c)
+   put(c,s);
+ };
+
+ s.onclick=()=>{
+  if(selected)
+   put(selected,s);
+ };
+
+ return s;
+}
+
+function put(card,slot){
+
+ if(slot.classList.contains("filled"))
+  return;
+
+ if(card.dataset.value===slot.dataset.answer){
+
+  slot.textContent=card.dataset.value;
+
+  slot.classList.add("filled");
+
+  card.classList.add("used");
+  card.classList.remove("selected");
+
+  selected=null;
+
+  addScore(10);
+
+  correctSound();
+
+  message("🎉 Correct!",true);
+
+  checkAllSlots();
+
+ }else{
+
+  card.classList.remove("selected");
+
+  selected=null;
+
+  wrongSound();
+
+  if(!loseOneLife("wrong"))
+   return;
+
+  lifeLostSound();
+
+  message("❌ Try again!",false);
+
+  if(lives<=0)
+   setTimeout(endGame,700);
+ }
+}
+
+function checkAllSlots(){
+
+ const slots=[
+  ...document.querySelectorAll(".slot")
+ ];
+
+ if(
+  slots.length &&
+  slots.every(s=>
+   s.classList.contains("filled")
+  )
+ ){
+
+  clearInterval(timer);
+
+  addScore(20);
+
+  winSound();
+
+  message("🌟 Perfect!",true);
+
+  setTimeout(nextLevel,850);
+ }
+}
+
+function setupGrid(title,cls,items){
+
+ $("area").innerHTML=
+  '<div class="title">'+
+  title+
+  '</div>'+
+  '<div class="'+cls+
+  '" id="grid"></div>';
+
+ items.forEach(x=>
+  $("grid").appendChild(
+   makeSlot(x)
+  )
+ );
+}
+
+function level1(){
+
+ $("instruction").textContent=
+  "Level 1 -- Put the days in order";
+
+ setupGrid(
+  "🗓️ Days of the Week",
+  "week",
+  DAYS
+ );
+
+ renderCards(DAYS);
+}
+
+function level2(){
+
+ $("instruction").textContent=
+  "Level 2 -- Find the missing day";
+
+ const i=
+  Math.floor(Math.random()*7);
+
+ const answer=DAYS[i];
+
+ $("area").innerHTML=
+  '<div class="title">'+
+  '🔍 Which day is missing?'+
+  '</div>'+
+  '<div class="week" id="grid"></div>';
+
+ DAYS.forEach((d,k)=>{
+
+  if(k===i){
+
+   $("grid").appendChild(
+    makeSlot(answer)
+   );
+
+  }else{
+
+   const x=
+    document.createElement("div");
+
+   x.className="slot filled";
+   x.textContent=d;
+
+   $("grid").appendChild(x);
+  }
+ });
+
+ renderCards([
+  answer,
+  ...shuffle(
+   DAYS.filter(x=>x!==answer)
+  ).slice(0,3)
+ ]);
+}
+
+function randomUnique(key,creator){
+
+ let q=creator(),
+     n=0;
+
+ while(
+  asked.has(key+q.text) &&
+  n<30
+ ){
+
+  q=creator();
+  n++;
+ }
+
+ asked.add(key+q.text);
+
+ return q;
+}
+
+function multipleChoice(kind){
+
+ let q=randomUnique(
+  kind,
+  ()=>{
+
+   if(kind==="afterDay"){
+
+    const i=
+     Math.floor(Math.random()*6);
+
+    return {
+     text:
+      "What day comes after "+
+      DAYS[i]+"?",
+     answer:DAYS[i+1],
+     pool:DAYS
+    };
+   }
+
+   if(kind==="beforeDay"){
+
+    const i=
+     1+
+     Math.floor(Math.random()*6);
+
+    return {
+     text:
+      "What day comes before "+
+      DAYS[i]+"?",
+     answer:DAYS[i-1],
+     pool:DAYS
+    };
+   }
+
+   if(kind==="afterMonth"){
+
+    const i=
+     Math.floor(Math.random()*11);
+
+    return {
+     text:
+      "What month comes after "+
+      MONTHS[i]+"?",
+     answer:MONTHS[i+1],
+     pool:MONTHS
+    };
+   }
+
+   if(kind==="relativeDay"){
+
+    const i=
+     Math.floor(Math.random()*7);
+
+    if(Math.random()<.5)
+
+     return {
+      text:
+       "If today is "+
+       DAYS[i]+
+       ", what is tomorrow?",
+      answer:
+       DAYS[(i+1)%7],
+      pool:DAYS
+     };
+
+    return {
+     text:
+      "If today is "+
+      DAYS[i]+
+      ", what was yesterday?",
+     answer:
+      DAYS[(i+6)%7],
+     pool:DAYS
+    };
+   }
+
+   const qs=[
+
+    [
+     "Which month comes before August?",
+     "July",
+     MONTHS
+    ],
+
+    [
+     "Which day comes after Friday?",
+     "Saturday",
+     DAYS
+    ],
+
+    [
+     "Which month comes after October?",
+     "November",
+     MONTHS
+    ],
+
+    [
+     "Which day comes before Tuesday?",
+     "Monday",
+     DAYS
+    ],
+
+    [
+     "Which month comes before May?",
+     "April",
+     MONTHS
+    ],
+
+    [
+     "Which day comes after Sunday?",
+     "Monday",
+     DAYS
+    ],
+
+    [
+     "What month comes 2 months after March?",
+     "May",
+     MONTHS
+    ],
+
+    [
+     "What month comes 3 months after January?",
+     "April",
+     MONTHS
+    ],
+
+    [
+     "Today is Monday. What day will it be in 3 days?",
+     "Thursday",
+     DAYS
+    ],
+
+    [
+     "Today is Friday. What day will it be in 2 days?",
+     "Sunday",
+     DAYS
+    ],
+
+    [
+     "Today is Tuesday. What day was it 2 days ago?",
+     "Sunday",
+     DAYS
+    ]
+
+   ];
+
+   const x=
+    qs[
+     Math.floor(
+      Math.random()*qs.length
+     )
+    ];
+
+   return {
+    text:x[0],
+    answer:x[1],
+    pool:x[2]
+   };
+  }
+ );
+
+ $("area").innerHTML=
+  '<div class="question">'+
+  '<h2>'+q.text+'</h2>'+
+  '</div>';
+
+ shuffle([
+  q.answer,
+  ...shuffle(
+   q.pool.filter(
+    x=>x!==q.answer
+   )
+  ).slice(0,3)
+ ]).forEach(v=>{
+
+  const b=
+   document.createElement("button");
+
+  b.className="option";
+  b.textContent=v;
+
+  b.onclick=()=>
+   choose(
+    b,
+    v,
+    q.answer
+   );
+
+  $("options").appendChild(b);
+ });
+}
+
+function choose(btn,value,answer){
+
+ [
+  ...document.querySelectorAll(".option")
+ ].forEach(
+  b=>b.disabled=true
+ );
+
+ if(value===answer){
+
+  btn.classList.add("correct");
+
+  addScore(10);
+
+  correctSound();
+
+  message(
+   "🎉 Correct!",
+   true
+  );
+
+  clearInterval(timer);
+
+  setTimeout(nextLevel,800);
+
+ }else{
+
+  btn.classList.add("wrong");
+
+  wrongSound();
+
+  if(!loseOneLife("wrong"))
+   return;
+
+  message(
+   "❌ Correct answer: "+answer,
+   false
+  );
+
+  if(lives<=0){
+
+   clearInterval(timer);
+
+   showGameOver(
+    "❤️",
+    "GAME OVER!",
+    "You used all 3 lives."
+   );
+
+  }else{
+
+   setTimeout(loadLevel,800);
+  }
+ }
+}
+
+function level3(){
+
+ $("instruction").textContent=
+  "Level 3 -- What comes after?";
+
+ multipleChoice("afterDay");
+}
+
+function level4(){
+
+ $("instruction").textContent=
+  "Level 4 -- What comes before?";
+
+ multipleChoice("beforeDay");
+}
+
+function level5(){
+
+ $("instruction").textContent=
+  "Level 5 -- Put the months in order";
+
+ setupGrid(
+  "📚 Months of the Year",
+  "months",
+  MONTHS
+ );
+
+ renderCards(MONTHS);
+}
+
+function level6(){
+
+ $("instruction").textContent=
+  "Level 6 -- Find the missing month";
+
+ const i=
+  Math.floor(Math.random()*12);
+
+ const answer=MONTHS[i];
+
+ $("area").innerHTML=
+  '<div class="title">'+
+  '🔍 Which month is missing?'+
+  '</div>'+
+  '<div class="months" id="grid"></div>';
+
+ MONTHS.forEach((m,k)=>{
+
+  if(k===i){
+
+   $("grid").appendChild(
+    makeSlot(answer)
+   );
+
+  }else{
+
+   const x=
+    document.createElement("div");
+
+   x.className="slot filled";
+   x.textContent=m;
+
+   $("grid").appendChild(x);
+  }
+ });
+
+ renderCards([
+  answer,
+  ...shuffle(
+   MONTHS.filter(x=>x!==answer)
+  ).slice(0,4)
+ ]);
+}
+
+function level7(){
+
+ $("instruction").textContent=
+  "Level 7 -- Month Challenge";
+
+ multipleChoice("afterMonth");
+}
+
+function level8(){
+
+ $("instruction").textContent=
+  "Level 8 -- Yesterday & Tomorrow";
+
+ multipleChoice("relativeDay");
+}
+
+function level9(){
+
+ $("instruction").textContent=
+  "Level 9 -- Mixed Challenge";
+
+ multipleChoice("mixed");
+}
+
+function level10(){
+
+ $("instruction").textContent=
+  "👑 Level 10 -- BOSS CHALLENGE";
+
+ multipleChoice("boss");
+}
+
+function playMusic(){
+
+ const m=$("music");
+
+ m.volume=.25;
+
+ m.play().catch(()=>{});
+}
+
+function musicToggle(){
+
+ const m=$("music");
+
+ if(m.paused)
+  m.play().catch(()=>{});
+ else
+  m.pause();
+}
+
+let ctx=null;
+
+function tone(f,d=.12){
+
+ try{
+
+  if(!ctx)
+   ctx=
+    new(window.AudioContext||
+    window.webkitAudioContext)();
+
+  const o=
+   ctx.createOscillator();
+
+  const g=
+   ctx.createGain();
+
+  o.frequency.value=f;
+  o.type="sine";
+  g.gain.value=.06;
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start();
+
+  g.gain.exponentialRampToValueAtTime(
+   .001,
+   ctx.currentTime+d
+  );
+
+  o.stop(
+   ctx.currentTime+d
+  );
+
+ }catch(e){}
+}
+
+function correctSound(){
+
+ tone(650,.1);
+
+ setTimeout(
+  ()=>tone(850,.12),
+  100
+ );
+}
+
+function wrongSound(){
+
+ try{
+
+  if(!ctx)
+   ctx=
+    new(window.AudioContext||
+    window.webkitAudioContext)();
+
+  if(ctx.state==="suspended")
+   ctx.resume();
+
+  const now=ctx.currentTime;
+
+  const o=
+   ctx.createOscillator();
+
+  const g=
+   ctx.createGain();
+
+  o.type="square";
+
+  o.frequency.setValueAtTime(
+   260,
+   now
+  );
+
+  o.frequency.exponentialRampToValueAtTime(
+   100,
+   now+.28
+  );
+
+  g.gain.setValueAtTime(
+   .16,
+   now
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+   .001,
+   now+.30
+  );
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start(now);
+  o.stop(now+.32);
+
+ }catch(e){}
+}
+
+function gameOverSound(){
+
+ try{
+
+  if(!ctx)
+   ctx=
+    new(window.AudioContext||
+    window.webkitAudioContext)();
+
+  if(ctx.state==="suspended")
+   ctx.resume();
+
+  const now=ctx.currentTime;
+
+  [440,330,220,140].forEach(
+   (freq,i)=>{
+
+    const o=
+     ctx.createOscillator();
+
+    const g=
+     ctx.createGain();
+
+    o.type="square";
+    o.frequency.value=freq;
+
+    const start=
+     now+i*.22;
+
+    g.gain.setValueAtTime(
+     .34,
+     start
+    );
+
+    g.gain.exponentialRampToValueAtTime(
+     .001,
+     start+.20
+    );
+
+    o.connect(g);
+    g.connect(ctx.destination);
+
+    o.start(start);
+    o.stop(start+.21);
+   }
+  );
+
+  const o=
+   ctx.createOscillator();
+
+  const g=
+   ctx.createGain();
+
+  o.type="sawtooth";
+
+  o.frequency.setValueAtTime(
+   110,
+   now+.82
+  );
+
+  o.frequency.exponentialRampToValueAtTime(
+   55,
+   now+1.15
+  );
+
+  g.gain.setValueAtTime(
+   .38,
+   now+.82
+  );
+
+  g.gain.exponentialRampToValueAtTime(
+   .001,
+   now+1.18
+  );
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start(now+.82);
+  o.stop(now+1.2);
+
+ }catch(e){}
+}
+
+function winSound(){
+
+ tone(500,.1);
+
+ setTimeout(
+  ()=>tone(700,.1),
+  100
+ );
+
+ setTimeout(
+  ()=>tone(900,.18),
+  200
+ );
+}
+
+function lifeLostSound(){
+ /* Keeps the game compatible with existing versions. */
+}
+
+</script>
+
+</body>
+</html>
